@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Pop 隨堂測驗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #1f1f2e, #4a00e0);
+            color: #ffffff;
+        }
+        .quiz-container {
+            width: 90%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .quiz-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px #4a00e0;
+            margin-bottom: 1rem;
+        }
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .options-container {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr;
+        }
+        .option-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 1rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .option-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .option-button.correct {
+            background-color: #34d399;
+            pointer-events: none;
+        }
+        .option-button.incorrect {
+            background-color: #ef4444;
+            pointer-events: none;
+        }
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        .message-box {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2rem;
+            z-index: 10;
+        }
+        .message-box h2 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #6ee7b7;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .message-box p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .message-box button {
+            background-color: #6ee7b7;
+            color: #1a202c;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+        }
+        .message-box button:hover {
+            background-color: #34d399;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.5);
+        }
+        @media (min-width: 640px) {
+            .options-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="quiz-container">
+        <h1 class="quiz-title">K-Pop 隨堂測驗</h1>
+        <div id="quiz-ui" class="hidden">
+            <p id="question-text" class="question-text">題目文字</p>
+            <div id="options-container" class="options-container">
+                <!-- 選項按鈕將由 JavaScript 生成 -->
+            </div>
+            <p class="score-display">分數：<span id="score">0</span></p>
+        </div>
+
+        <!-- 遊戲訊息框 -->
+        <div id="message-box" class="message-box">
+            <h2 id="message-title">準備好了嗎？</h2>
+            <p id="message-text">測驗共有 5 題。<br>看看你能答對幾題！</p>
+            <button id="start-button">開始測驗</button>
+        </div>
+    </div>
+
+    <script>
+        // 測驗問題資料
+        const questions = [
+            {
+                question: "以下哪一個團體不屬於韓國四大娛樂公司（SM, YG, JYP, HYBE）？",
+                options: ["BTS", "BLACKPINK", "TWICE", "SEVENTEEN"],
+                answer: 3
+            },
+            {
+                question: "被稱為『概念女王』的 K-pop 團體是？",
+                options: ["Red Velvet", "TWICE", "MAMAMOO", "ITZY"],
+                answer: 0
+            },
+            {
+                question: "哪一位 Solo 歌手以其強大的高音和現場演唱實力而聞名，有『OST女王』之稱？",
+                options: ["IU", "Taeyeon", "Chungha", "Sunmi"],
+                answer: 1
+            },
+            {
+                question: "哪一首歌的 MV 在 YouTube 上最快達到 1 億次觀看？",
+                options: ["Dynamite (BTS)", "How You Like That (BLACKPINK)", "LALISA (Lisa)", "Butter (BTS)"],
+                answer: 3
+            },
+            {
+                question: "『MAMAMOO』團體名稱的靈感來自於什麼？",
+                options: ["嬰兒發出的第一聲", "希臘神話中的女神", "韓國傳統音樂的節奏", "成員們的暱稱組合"],
+                answer: 0
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const quizUI = document.getElementById('quiz-ui');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const scoreDisplay = document.getElementById('score');
+        const messageBox = document.getElementById('message-box');
+        const messageTitle = document.getElementById('message-title');
+        const messageText = document.getElementById('message-text');
+        const startButton = document.getElementById('start-button');
+
+        // 顯示當前問題
+        function displayQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionText.textContent = q.question;
+            optionsContainer.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-button');
+                button.addEventListener('click', () => checkAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // 檢查答案並更新分數
+        function checkAnswer(selectedIndex) {
+            const q = questions[currentQuestionIndex];
+            const buttons = optionsContainer.querySelectorAll('.option-button');
+
+            // 禁用所有按鈕
+            buttons.forEach(button => button.style.pointerEvents = 'none');
+
+            if (selectedIndex === q.answer) {
+                score++;
+                buttons[selectedIndex].classList.add('correct');
+            } else {
+                buttons[selectedIndex].classList.add('incorrect');
+                buttons[q.answer].classList.add('correct');
+            }
+
+            scoreDisplay.textContent = score;
+            
+            // 延遲一段時間後顯示下一題或結果
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    displayQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        // 顯示最終結果
+        function showResults() {
+            quizUI.classList.add('hidden');
+            messageBox.style.display = 'flex';
+            messageTitle.textContent = "測驗結束！";
+            messageText.innerHTML = `你答對了 ${score} 題中的 ${questions.length} 題。<br>做得好！`;
+            startButton.textContent = "再玩一次";
+        }
+
+        // 啟動遊戲
+        function startGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreDisplay.textContent = score;
+            messageBox.style.display = 'none';
+            quizUI.classList.remove('hidden');
+            displayQuestion();
+        }
+
+        // 開始按鈕事件
+        startButton.addEventListener('click', startGame);
+
+    </script>
+</body>
+</html>
